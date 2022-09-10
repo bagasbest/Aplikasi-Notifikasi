@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/temp/Aquascaper/app/src/main/res/drawable/bg_border_green.xml" value="0.166" />
+        <entry key="..\:/temp/Aquascaper/app/src/main/res/drawable/bg_border_purple.xml" value="0.166" />
+        <entry key="..\:/temp/Aquascaper/app/src/main/res/drawable/bg_border_yellow.xml" value="0.166" />
+        <entry key="..\:/temp/Aquascaper/app/src/main/res/drawable/bg_button.xml" value="0.166" />
+        <entry key="..\:/temp/Aquascaper/app/src/main/res/drawable/bg_rounded.xml" value="0.166" />
+        <entry key="..\:/temp/Aquascaper/app/src/main/res/drawable/bg_rounded_blue.xml" value="0.166" />
+        <entry key="..\:/temp/Aquascaper/app/src/main/res/drawable/bg_rounded_btn.xml" value="0.166" />
+        <entry key="..\:/temp/Aquascaper/app/src/main/res/drawable/bg_rounded_green.xml" value="0.166" />
+        <entry key="..\:/temp/Aquascaper/app/src/main/res/drawable/bg_rounded_on_off.xml" value="0.166" />
+        <entry key="..\:/temp/Aquascaper/app/src/main/res/drawable/bg_rounded_orange.xml" value="0.166" />
+        <entry key="..\:/temp/Aquascaper/app/src/main/res/layout/activity_about.xml" value="0.22780797101449277" />
+        <entry key="..\:/temp/Aquascaper/app/src/main/res/layout/activity_help.xml" value="0.22239583333333332" />
+        <entry key="..\:/temp/Aquascaper/app/src/main/res/layout/activity_home.xml" value="0.2" />
+        <entry key="..\:/temp/Aquascaper/app/src/main/res/layout/activity_main.xml" value="0.22780797101449277" />
+        <entry key="..\:/temp/Aquascaper/app/src/main/res/layout/fragment_home.xml" value="0.176" />
+        <entry key="..\:/temp/Aquascaper/app/src/main/res/layout/fragment_notifications.xml" value="0.22780797101449277" />
+        <entry key="..\:/temp/Aquascaper/app/src/main/res/layout/popup_menu_input.xml" value="0.22780797101449277" />
+        <entry key="..\:/temp/Aquascaper/app/src/main/res/layout/popup_menu_option.xml" value="0.22780797101449277" />
+        <entry key="..\:/temp/Aquascaper/app/src/main/res/menu/bottom_nav_menu.xml" value="0.23645833333333333" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "795702695483",
+    "firebase_url": "https://weighty-elf-360210-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "weighty-elf-360210",
+    "storage_bucket": "weighty-elf-360210.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:795702695483:android:7cfe45eb99ecad2de8ae1e",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "795702695483-nrej8bub2nhooomk88sao5d80miqvaoa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzrnue4gx0GpG2XHrVPKdmmU-UHEHZ1TA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "795702695483-nrej8bub2nhooomk88sao5d80miqvaoa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:795702695483:android:e83ab4ce8c923f36e8ae1e",
+        "android_client_info": {
+          "package_name": "com.project.aquascaper"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "795702695483-nrej8bub2nhooomk88sao5d80miqvaoa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzrnue4gx0GpG2XHrVPKdmmU-UHEHZ1TA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "795702695483-nrej8bub2nhooomk88sao5d80miqvaoa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

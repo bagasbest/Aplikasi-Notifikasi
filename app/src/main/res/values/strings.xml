@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Aquascaper</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_home">Devices</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Alets</string>
+</resources>
