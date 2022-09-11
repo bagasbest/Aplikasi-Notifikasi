@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.project.aquascaper">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -14,10 +16,10 @@
         android:theme="@style/Theme.Aquascaper"
         tools:targetApi="31">
         <activity
-            android:name=".HelpActivity"
+            android:name=".ui.home.HelpActivity"
             android:exported="false" />
         <activity
-            android:name=".AboutActivity"
+            android:name=".ui.home.AboutActivity"
             android:exported="false" />
         <activity
             android:name=".HomeActivity"
