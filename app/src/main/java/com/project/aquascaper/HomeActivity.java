@@ -23,6 +23,7 @@ public class HomeActivity extends AppCompatActivity {
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        /// fungsi untuk membuat bottom navigation berisi Device / home, dan halaman notifikasi
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_home);
         NavigationUI.setupWithNavController(binding.navView, navController);
     }

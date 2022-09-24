@@ -26,12 +26,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        /// Logo aplikasi
         Glide.with(MainActivity.this)
                 .load(R.drawable.logo)
                 .into(binding.logo);
 
 //        createFcmToken();
 
+        /// fungsi untuk delay splash screen selama 3 detik
         final Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             @Override

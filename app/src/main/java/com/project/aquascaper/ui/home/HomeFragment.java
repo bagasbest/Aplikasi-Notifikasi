@@ -49,6 +49,7 @@ import java.util.Random;
 
 public class HomeFragment extends Fragment {
 
+    /// kumpulan variabel sensor sengaja di taruh diatas supaya bisa di akses seluruh class
     private FragmentHomeBinding binding;
     private String ppm = "";
     private String temperature = "";
@@ -58,141 +59,13 @@ public class HomeFragment extends Fragment {
     private String fan = "";
     private String solenoid = "";
     private boolean isWaiting = false;
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        fetchDateFromRealtimeDatabase();
-    }
-
-    private void fetchDateFromRealtimeDatabase() {
-        // Get a reference to our posts
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference("inputSensor");
-
-        // Attach a listener to read the data at our posts reference
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Sensor sensor = dataSnapshot.getValue(Sensor.class);
-                ppm = String.valueOf(sensor.getCO2());
-                temperature = String.valueOf(sensor.getSuhu());
-                pHMeter = String.valueOf(sensor.getpH());
-                turbidity = String.valueOf(sensor.getTurbidity());
-                ledLamp = sensor.getLED();
-                fan = sensor.getFan();
-                solenoid = sensor.getSolenoid();
-
-                if(!isWaiting) {
-                    isWaiting = true;
-                    final Handler handler = new Handler(Looper.getMainLooper());
-                    handler.postDelayed(() -> {
-                        initNotification();
-                        initData();
-                        isWaiting = false;
-                    }, 100);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
-            }
-        });
-    }
-
-    private void initNotification() {
-        if(Double.parseDouble(turbidity) > 25.0) {
-            String body = "Air terlalu keruh, pastikan segera membersihkan aquascape";
-            sendNotif(body);
-            saveNotif(body);
-        }
-
-        if(Double.parseDouble(ppm) > 800.0 && Objects.equals(solenoid, "ON")) {
-            String body = "CO2 terlalu tinggi, pastikan segera matikan solenoid";
-            sendNotif(body);
-            saveNotif(body);
-        } else if (Double.parseDouble(ppm) < 400.0&& Objects.equals(solenoid, "OFF")){
-            Log.e("dasadasa", "soleeeee on");
-            String body = "CO2 terlalu rendah, pastikan segera menyalakan solenoid";
-            sendNotif(body);
-            saveNotif(body);
-        }
-
-
-        if(Double.parseDouble(pHMeter) > 8.0) {
-            String body = "pH terlalu basa, pastikan segera melakukan tindakan menurunkan kadar pH";
-            sendNotif(body);
-            saveNotif(body);
-        } else if (Double.parseDouble(pHMeter) < 6.0){
-            String body = "pH terlalu asam, pastikan segera melakukan tindakan menaikkan kadar pH";
-            sendNotif(body);
-            saveNotif(body);
-        }
-
-
-        if(Double.parseDouble(temperature) > 28.0 && Objects.equals(fan, "OFF")) {
-            String body = "Suhu terlalu panas, pastikan untuk segera menyalakan kipas pada aquascape";
-            sendNotif(body);
-            saveNotif(body);
-        } else if (Double.parseDouble(temperature) < 24.0 && Objects.equals(ledLamp, "OFF")){
-            String body = "Suhu terlalu dingin, pastikan untuk segera menyalakan lampu pada aquascape";
-            sendNotif(body);
-            saveNotif(body);
-        }
-    }
-
-    private void saveNotif(String body) {
-        long timeInMillis = System.currentTimeMillis();
-        // Create a DateFormatter object for displaying date in specified format.
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        // Create a calendar object that will convert the date and time value in milliseconds to date.
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(timeInMillis);
-        String hour = formatter.format(calendar.getTime());
-
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference("notification/"+ timeInMillis);
-        ref.child("notification").setValue(body);
-        ref.child("hour").setValue(hour);
-    }
-
-    private void initData() {
-        binding.temperatureValue.setText(temperature+ "°C");
-        binding.phValue.setText(pHMeter+ "");
-        binding.turbidityValue.setText(turbidity+ " NTU");
-        binding.ppmValue.setText(ppm+ "");
-
-        if(!Objects.equals(ledLamp, "OFF")) {
-            binding.onLedLamp.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_rounded_on_off));
-            binding.onLedLamp.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
-        } else{
-            binding.offLedLamp.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_rounded_on_off));
-            binding.offLedLamp.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
-        }
-
-        if(!Objects.equals(fan, "OFF")) {
-            binding.onFan.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_rounded_on_off));
-            binding.onFan.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
-        } else {
-            binding.offFan.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_rounded_on_off));
-            binding.offFan.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
-        }
-
-        if(!Objects.equals(solenoid, "OFF")) {
-            binding.onSolenoid.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_rounded_on_off));
-            binding.onSolenoid.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
-        } else {
-            binding.offSolenoid.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_rounded_on_off));
-            binding.offSolenoid.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
-        }
-
-        binding.swipeRefresh.setRefreshing(false);
-    }
+    private int count = 0;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
+        /// fungsi untuk set data sensor dari firebase
+        fetchDateFromRealtimeDatabase();
 
         return binding.getRoot();
     }
@@ -329,12 +202,162 @@ public class HomeFragment extends Fragment {
         });
     }
 
+
+
+    //======================================== FUNCTION ==================================================
+
+    private void fetchDateFromRealtimeDatabase() {
+        // Get a reference to our posts
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("inputSensor");
+
+        // Attach a listener to read the data at our posts reference
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                /// membaca data dari firebase dan dimasukkan kedalam variable yang sudah dibuat
+                Sensor sensor = dataSnapshot.getValue(Sensor.class);
+                ppm = String.valueOf(sensor.getCO2());
+                temperature = String.valueOf(sensor.getSuhu());
+                pHMeter = String.valueOf(sensor.getpH());
+                turbidity = String.valueOf(sensor.getTurbidity());
+                ledLamp = sensor.getLED();
+                fan = sensor.getFan();
+                solenoid = sensor.getSolenoid();
+
+                try {
+                    /// fungsi untuk menampilkan selutuh nilai berdasarkan variabel dari atas
+                    initData();
+                } catch (Exception e) {
+                    Log.e("ERROR HOME", e.getMessage());
+                }
+
+                if(!isWaiting) {
+                    isWaiting = true;
+                    final Handler handler = new Handler(Looper.getMainLooper());
+                    handler.postDelayed(() -> {
+                        //// fungsi untuk mengecek apakah melebihi batas / belum, sehingga notifikasi nanti bisa tampil
+                        initNotification();
+                        isWaiting = false;
+                    }, 5000);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+    }
+
+    private void initNotification() {
+        if(Double.parseDouble(turbidity) > 25.0) {
+            Log.e("1", "1");
+            String body = "Air terlalu keruh, pastikan segera membersihkan aquascape";
+            sendNotif(body);
+            saveNotif(body);
+        }
+
+        if(Double.parseDouble(ppm) > 800.0 && Objects.equals(solenoid, "ON")) {
+            Log.e("1", "2");
+            String body = "CO2 terlalu tinggi, pastikan segera matikan solenoid";
+            sendNotif(body);
+            saveNotif(body);
+        } else if (Double.parseDouble(ppm) < 400.0&& Objects.equals(solenoid, "OFF")){
+            Log.e("1", "3");
+            Log.e("dasadasa", "soleeeee on");
+            String body = "CO2 terlalu rendah, pastikan segera menyalakan solenoid";
+            sendNotif(body);
+            saveNotif(body);
+        }
+
+
+        if(Double.parseDouble(pHMeter) > 8.0) {
+            Log.e("1", "4");
+            String body = "pH terlalu basa, pastikan segera melakukan tindakan menurunkan kadar pH";
+            sendNotif(body);
+            saveNotif(body);
+        } else if (Double.parseDouble(pHMeter) < 6.0){
+            Log.e("1", "5");
+            String body = "pH terlalu asam, pastikan segera melakukan tindakan menaikkan kadar pH";
+            sendNotif(body);
+            saveNotif(body);
+        }
+
+
+        if(Double.parseDouble(temperature) > 28.0 && Objects.equals(fan, "OFF")) {
+            Log.e("1", "6");
+
+            String body = "Suhu terlalu panas, pastikan untuk segera menyalakan kipas pada aquascape";
+            sendNotif(body);
+            saveNotif(body);
+        } else if (Double.parseDouble(temperature) < 24.0 && Objects.equals(ledLamp, "OFF")){
+            Log.e("1", "7");
+            String body = "Suhu terlalu dingin, pastikan untuk segera menyalakan lampu pada aquascape";
+            sendNotif(body);
+            saveNotif(body);
+        }
+    }
+
+    /// fungsi untuk menyimpan notifikasi di firebase
+    private void saveNotif(String body) {
+        long timeInMillis = System.currentTimeMillis();
+        // Create a DateFormatter object for displaying date in specified format.
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        // Create a calendar object that will convert the date and time value in milliseconds to date.
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timeInMillis);
+        String hour = formatter.format(calendar.getTime());
+
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("notification/"+ timeInMillis);
+        ref.child("notification").setValue(body);
+        ref.child("hour").setValue(hour);
+    }
+
+    private void initData() {
+        binding.temperatureValue.setText(temperature+ "°C");
+        binding.phValue.setText(pHMeter+ "");
+        binding.turbidityValue.setText(turbidity+ " NTU");
+        binding.ppmValue.setText(ppm+ "");
+
+        if(!Objects.equals(ledLamp, "OFF")) {
+            binding.onLedLamp.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_rounded_on_off));
+            binding.onLedLamp.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
+        } else{
+            binding.offLedLamp.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_rounded_on_off));
+            binding.offLedLamp.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
+        }
+
+        if(!Objects.equals(fan, "OFF")) {
+            binding.onFan.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_rounded_on_off));
+            binding.onFan.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
+        } else {
+            binding.offFan.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_rounded_on_off));
+            binding.offFan.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
+        }
+
+        if(!Objects.equals(solenoid, "OFF")) {
+            binding.onSolenoid.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_rounded_on_off));
+            binding.onSolenoid.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
+        } else {
+            binding.offSolenoid.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_rounded_on_off));
+            binding.offSolenoid.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
+        }
+
+        binding.swipeRefresh.setRefreshing(false);
+    }
+
+
+
+    /// fungsi untuk update value sensor
     private void updateValueNoOff(String sensor, String option) {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("inputSensor");
         ref.child(sensor).setValue(option);
     }
 
+    /// fungsi untuk menampilkan kolom inputan ketika salah satu item sensor di klik untuk di update
     private void showDialog(String option) {
         Dialog dialog = new Dialog(getActivity());
         TextView title;
@@ -391,6 +414,7 @@ public class HomeFragment extends Fragment {
         dialog.show();
     }
 
+    /// update nilai sensor
     private void updateValueSensor(String sensor, String value) {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("inputSensor");
@@ -399,6 +423,7 @@ public class HomeFragment extends Fragment {
         showToast("Anda mengupdate nilai " + sensor + " menjadi " + value);
     }
 
+    /// hilangkan kolom inputan setelah update data
     private void processValue(String option, ProgressBar pb, String value, Dialog dialog) {
         pb.setVisibility(View.GONE);
         dialog.dismiss();
@@ -409,6 +434,7 @@ public class HomeFragment extends Fragment {
     }
 
 
+    /// menampilkan pilihan help atau aboutr apps
     private void showOptionMenu() {
         TextView about, help;
         Dialog dialog = new Dialog(getActivity());
@@ -437,6 +463,7 @@ public class HomeFragment extends Fragment {
     }
 
 
+    /// menampilkan notifikasi
     private void sendNotif(String notification) {
 
         SharedPreferences prefs = getActivity().getSharedPreferences("NOTIFICATION", Context.MODE_PRIVATE);
@@ -447,6 +474,7 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    /// fungsi untuk menampilkan notifikasi
     private void buildNotification(String notification) {
         Intent intent = new Intent(getActivity(), MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

@@ -77,6 +77,7 @@ public class NotificationsFragment extends Fragment {
             }
         });
 
+        /// menyimpan settingan on / off notifikasi
         SharedPreferences prefs = getActivity().getSharedPreferences("NOTIFICATION", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         boolean isNotificationEnable = prefs.getBoolean("notification", false);
@@ -104,6 +105,16 @@ public class NotificationsFragment extends Fragment {
             }
         });
 
+
+        /// refresh riwayat notifikasi
+        binding.refreshBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                initRecyclerView();
+                initViewModel();
+            }
+        });
+
     }
 
     private void showAlertDialog() {
@@ -120,6 +131,8 @@ public class NotificationsFragment extends Fragment {
                 .show();
     }
 
+
+    /// fungsi untuk hapus notifikasi
     private void deleteNotification() {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("notification");

@@ -33,20 +33,23 @@ public class NotificationViewModel extends ViewModel {
             DatabaseReference ref = database.getReference("notification");
 
 
+            /// mendapatkan list notifikasi dari firebase
             ref.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     for (DataSnapshot ds : snapshot.getChildren()) {
                         try {
-                            String hour = ds.child("hour").getValue().toString();
-                            String notification = ds.child("notification").getValue().toString();
+                            if (ds.child("hour").getValue() != null && ds.child("notification").getValue() != null) {
+                                String hour = "" + ds.child("hour").getValue();
+                                String notification = "" + ds.child("notification").getValue();
 
-                            NotificationModel model = new NotificationModel();
-                            model.setNotification(notification);
-                            model.setHour(hour);
-                            notificationModelArrayList.add(model);
+                                NotificationModel model = new NotificationModel();
+                                model.setNotification(notification);
+                                model.setHour(hour);
+                                notificationModelArrayList.add(model);
+                            }
                         } catch (Exception e) {
-                            Log.e("MESSAGE ERROR", e.getMessage().toString());
+                            Log.e("MESSAGE ERROR", e.getMessage());
                         }
 
                     }
