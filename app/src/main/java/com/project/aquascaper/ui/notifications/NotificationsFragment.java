@@ -1,5 +1,6 @@
 package com.project.aquascaper.ui.notifications;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -12,30 +13,57 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-
+import androidx.recyclerview.widget.LinearLayoutManager;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.project.aquascaper.R;
 import com.project.aquascaper.databinding.FragmentNotificationsBinding;
 import com.project.aquascaper.ui.home.AboutActivity;
 import com.project.aquascaper.ui.home.HelpActivity;
-
-import java.util.Objects;
-
 public class NotificationsFragment extends Fragment {
 
     private FragmentNotificationsBinding binding;
+    private NotificationAdapter adapter;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         binding = FragmentNotificationsBinding.inflate(inflater, container, false);
-
+        initRecyclerView();
+        initViewModel();
         return binding.getRoot();
     }
+
+    /// FUNGSI UNTUK MENAMPILKAN LIST DATA
+    private void initRecyclerView() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager.setReverseLayout(true);
+        layoutManager.setStackFromEnd(true);
+        binding.notificationRv.setLayoutManager(layoutManager);
+        adapter = new NotificationAdapter();
+        binding.notificationRv.setAdapter(adapter);
+    }
+
+    /// FUNGSI UNTUK MENDAPATKAN LIST DATA notification DARI FIREBASE
+    private void initViewModel() {
+        NotificationViewModel viewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
+        binding.progressBar.setVisibility(View.VISIBLE);
+        viewModel.setListNotification();
+        viewModel.getNotification().observe(getViewLifecycleOwner(), notificationList -> {
+            if (notificationList.size() > 0) {
+                binding.noData.setVisibility(View.GONE);
+                adapter.setData(notificationList);
+            } else {
+                binding.noData.setVisibility(View.VISIBLE);
+            }
+            binding.progressBar.setVisibility(View.GONE);
+        });
+    }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -49,17 +77,17 @@ public class NotificationsFragment extends Fragment {
             }
         });
 
-        SharedPreferences prefs = requireActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences prefs = getActivity().getSharedPreferences("NOTIFICATION", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         boolean isNotificationEnable = prefs.getBoolean("notification", false);
         binding.switchBtn.setChecked(isNotificationEnable);
         binding.switchBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if(compoundButton.isChecked()) {
+                if (compoundButton.isChecked()) {
                     editor.putBoolean("notification", true);
                     Toast.makeText(getActivity(), "Notifikasi Dinyalakan", Toast.LENGTH_SHORT).show();
-                } else  {
+                } else {
                     editor.putBoolean("notification", false);
                     Toast.makeText(getActivity(), "Notifikasi Dimatikan", Toast.LENGTH_SHORT).show();
                 }
@@ -67,6 +95,43 @@ public class NotificationsFragment extends Fragment {
             }
         });
 
+
+        /// Hapus notifikasi
+        binding.deleteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showAlertDialog();
+            }
+        });
+
+    }
+
+    private void showAlertDialog() {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+        dialog.setTitle("Konfirmasi Menghapus Notifikasi")
+                .setIcon(R.drawable.ic_baseline_delete_24)
+                .setCancelable(false)
+                .setMessage("Apa anda yakin ingin menghapus seluruh riwayat notifikasi ini ?")
+                .setPositiveButton("YA", (dialogDismiss, i) -> {
+                   deleteNotification();
+                    dialogDismiss.dismiss();
+                })
+                .setNegativeButton("TIDAK", null)
+                .show();
+    }
+
+    private void deleteNotification() {
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("notification");
+        ref.removeValue().addOnCompleteListener(task -> {
+            if(task.isSuccessful()) {
+                initRecyclerView();
+                initViewModel();
+                Toast.makeText(getActivity(), "Berhasil menghapus riwayat notifikasi", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getActivity(), "Gagal menghapus riwayat notifikasi", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 

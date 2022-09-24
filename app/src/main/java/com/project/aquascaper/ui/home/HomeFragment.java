@@ -1,9 +1,19 @@
 package com.project.aquascaper.ui.home;
 
 import android.app.Dialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -24,10 +35,18 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.project.aquascaper.HomeActivity;
+import com.project.aquascaper.MainActivity;
 import com.project.aquascaper.R;
 import com.project.aquascaper.data.Sensor;
 import com.project.aquascaper.databinding.FragmentHomeBinding;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.Random;
+
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
@@ -38,6 +57,7 @@ public class HomeFragment extends Fragment {
     private String ledLamp = "";
     private String fan = "";
     private String solenoid = "";
+    private boolean isWaiting = false;
 
     @Override
     public void onResume() {
@@ -63,7 +83,15 @@ public class HomeFragment extends Fragment {
                 fan = sensor.getFan();
                 solenoid = sensor.getSolenoid();
 
-                initData();
+                if(!isWaiting) {
+                    isWaiting = true;
+                    final Handler handler = new Handler(Looper.getMainLooper());
+                    handler.postDelayed(() -> {
+                        initNotification();
+                        initData();
+                        isWaiting = false;
+                    }, 100);
+                }
             }
 
             @Override
@@ -71,6 +99,62 @@ public class HomeFragment extends Fragment {
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
+    }
+
+    private void initNotification() {
+        if(Double.parseDouble(turbidity) > 25.0) {
+            String body = "Air terlalu keruh, pastikan segera membersihkan aquascape";
+            sendNotif(body);
+            saveNotif(body);
+        }
+
+        if(Double.parseDouble(ppm) > 800.0 && Objects.equals(solenoid, "ON")) {
+            String body = "CO2 terlalu tinggi, pastikan segera matikan solenoid";
+            sendNotif(body);
+            saveNotif(body);
+        } else if (Double.parseDouble(ppm) < 400.0&& Objects.equals(solenoid, "OFF")){
+            Log.e("dasadasa", "soleeeee on");
+            String body = "CO2 terlalu rendah, pastikan segera menyalakan solenoid";
+            sendNotif(body);
+            saveNotif(body);
+        }
+
+
+        if(Double.parseDouble(pHMeter) > 8.0) {
+            String body = "pH terlalu basa, pastikan segera melakukan tindakan menurunkan kadar pH";
+            sendNotif(body);
+            saveNotif(body);
+        } else if (Double.parseDouble(pHMeter) < 6.0){
+            String body = "pH terlalu asam, pastikan segera melakukan tindakan menaikkan kadar pH";
+            sendNotif(body);
+            saveNotif(body);
+        }
+
+
+        if(Double.parseDouble(temperature) > 28.0 && Objects.equals(fan, "OFF")) {
+            String body = "Suhu terlalu panas, pastikan untuk segera menyalakan kipas pada aquascape";
+            sendNotif(body);
+            saveNotif(body);
+        } else if (Double.parseDouble(temperature) < 24.0 && Objects.equals(ledLamp, "OFF")){
+            String body = "Suhu terlalu dingin, pastikan untuk segera menyalakan lampu pada aquascape";
+            sendNotif(body);
+            saveNotif(body);
+        }
+    }
+
+    private void saveNotif(String body) {
+        long timeInMillis = System.currentTimeMillis();
+        // Create a DateFormatter object for displaying date in specified format.
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        // Create a calendar object that will convert the date and time value in milliseconds to date.
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timeInMillis);
+        String hour = formatter.format(calendar.getTime());
+
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("notification/"+ timeInMillis);
+        ref.child("notification").setValue(body);
+        ref.child("hour").setValue(hour);
     }
 
     private void initData() {
@@ -127,6 +211,7 @@ public class HomeFragment extends Fragment {
         binding.onFan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                updateValueNoOff("Fan", "ON");
                 binding.onFan.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_rounded_on_off));
                 binding.onFan.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
 
@@ -140,6 +225,7 @@ public class HomeFragment extends Fragment {
         binding.offFan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                updateValueNoOff("Fan", "OFF");
                 binding.offFan.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_rounded_on_off));
                 binding.offFan.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
 
@@ -153,6 +239,7 @@ public class HomeFragment extends Fragment {
         binding.onLedLamp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                updateValueNoOff("LED", "ON");
                 binding.onLedLamp.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_rounded_on_off));
                 binding.onLedLamp.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
 
@@ -166,6 +253,7 @@ public class HomeFragment extends Fragment {
         binding.offLedLamp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                updateValueNoOff("LED", "OFF");
                 binding.offLedLamp.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_rounded_on_off));
                 binding.offLedLamp.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
 
@@ -179,6 +267,7 @@ public class HomeFragment extends Fragment {
         binding.onSolenoid.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                updateValueNoOff("Solenoid", "ON");
                 binding.onSolenoid.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_rounded_on_off));
                 binding.onSolenoid.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
 
@@ -192,6 +281,7 @@ public class HomeFragment extends Fragment {
         binding.offSolenoid.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                updateValueNoOff("Solenoid", "OFF");
                 binding.offSolenoid.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_rounded_on_off));
                 binding.offSolenoid.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
 
@@ -239,6 +329,12 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    private void updateValueNoOff(String sensor, String option) {
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("inputSensor");
+        ref.child(sensor).setValue(option);
+    }
+
     private void showDialog(String option) {
         Dialog dialog = new Dialog(getActivity());
         TextView title;
@@ -274,13 +370,17 @@ public class HomeFragment extends Fragment {
                 pb.setVisibility(View.GONE);
             } else {
                 if(Objects.equals(option, "Temperature")) {
-                    binding.temperatureValue.setText(value);
+                    binding.temperatureValue.setText(value + "°C");
+                    updateValueSensor("suhu", value);
                 } else if (Objects.equals(option, "pH Meter")) {
                     binding.phValue.setText(value);
+                    updateValueSensor("pH", value);
                 } else if (Objects.equals(option, "Turbidity")) {
-                    binding.turbidityValue.setText(value);
+                    binding.turbidityValue.setText(value+" NTU");
+                    updateValueSensor("turbidity", value);
                 } else if (Objects.equals(option, "PPM")) {
                     binding.ppmValue.setText(value);
+                    updateValueSensor("CO2", value);
                 }
                 processValue(option, pb, value, dialog);
             }
@@ -291,13 +391,17 @@ public class HomeFragment extends Fragment {
         dialog.show();
     }
 
+    private void updateValueSensor(String sensor, String value) {
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("inputSensor");
+        ref.child(sensor).setValue(Double.parseDouble(value));
+
+        showToast("Anda mengupdate nilai " + sensor + " menjadi " + value);
+    }
+
     private void processValue(String option, ProgressBar pb, String value, Dialog dialog) {
         pb.setVisibility(View.GONE);
         dialog.dismiss();
-    }
-
-    private void processValue(String option) {
-
     }
 
     private void showToast(String option) {
@@ -331,6 +435,45 @@ public class HomeFragment extends Fragment {
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         dialog.show();
     }
+
+
+    private void sendNotif(String notification) {
+
+        SharedPreferences prefs = getActivity().getSharedPreferences("NOTIFICATION", Context.MODE_PRIVATE);
+        boolean isNotificationEnable = prefs.getBoolean("notification", false);
+
+        if(isNotificationEnable) {
+            buildNotification(notification);
+        }
+    }
+
+    private void buildNotification(String notification) {
+        Intent intent = new Intent(getActivity(), MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        final int NOTIFICATION_ID = (int)System.currentTimeMillis();
+        PendingIntent pendingIntent = PendingIntent.getActivity(getActivity(), NOTIFICATION_ID,intent, PendingIntent.FLAG_IMMUTABLE);
+
+        String channelId = getString(R.string.app_name);
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getActivity(), channelId)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("Aquascaper")
+                .setContentText(notification)
+                .setAutoCancel(true)
+                .setSound(defaultSoundUri)
+                .setContentIntent(pendingIntent);
+
+        NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(channelId, "Aquascaper", NotificationManager.IMPORTANCE_HIGH);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+    }
+
 
     @Override
     public void onDestroyView() {
