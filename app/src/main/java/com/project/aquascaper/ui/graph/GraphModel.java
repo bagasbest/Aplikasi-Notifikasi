@@ -5,26 +5,32 @@ import android.os.Parcelable;
 
 public class GraphModel implements Parcelable {
 
-    private String notification;
-    private String hour;
+
     private String dayOfWeek;
     private int week;
     private String parameter;
-    private Long timeInMillis;
+    private double value;
 
     public GraphModel(){}
 
     protected GraphModel(Parcel in) {
-        notification = in.readString();
-        hour = in.readString();
         dayOfWeek = in.readString();
         week = in.readInt();
         parameter = in.readString();
-        if (in.readByte() == 0) {
-            timeInMillis = null;
-        } else {
-            timeInMillis = in.readLong();
-        }
+        value = in.readDouble();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(dayOfWeek);
+        dest.writeInt(week);
+        dest.writeString(parameter);
+        dest.writeDouble(value);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<GraphModel> CREATOR = new Creator<GraphModel>() {
@@ -38,22 +44,6 @@ public class GraphModel implements Parcelable {
             return new GraphModel[size];
         }
     };
-
-    public String getNotification() {
-        return notification;
-    }
-
-    public void setNotification(String notification) {
-        this.notification = notification;
-    }
-
-    public String getHour() {
-        return hour;
-    }
-
-    public void setHour(String hour) {
-        this.hour = hour;
-    }
 
     public String getDayOfWeek() {
         return dayOfWeek;
@@ -79,31 +69,11 @@ public class GraphModel implements Parcelable {
         this.parameter = parameter;
     }
 
-    public Long getTimeInMillis() {
-        return timeInMillis;
+    public double getValue() {
+        return value;
     }
 
-    public void setTimeInMillis(Long timeInMillis) {
-        this.timeInMillis = timeInMillis;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(notification);
-        parcel.writeString(hour);
-        parcel.writeString(dayOfWeek);
-        parcel.writeInt(week);
-        parcel.writeString(parameter);
-        if (timeInMillis == null) {
-            parcel.writeByte((byte) 0);
-        } else {
-            parcel.writeByte((byte) 1);
-            parcel.writeLong(timeInMillis);
-        }
+    public void setValue(double value) {
+        this.value = value;
     }
 }

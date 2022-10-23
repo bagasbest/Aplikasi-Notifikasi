@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Description;
@@ -37,13 +38,13 @@ public class ChartActivity extends AppCompatActivity {
     private ArrayList<GraphModel> graphList;
 
     /// day init
-    private int senin = 0;
-    private int selasa = 0;
-    private int rabu = 0;
-    private int kamis = 0;
-    private int jumat = 0;
-    private int sabtu = 0;
-    private int minggu = 0;
+    private double senin = 0;
+    private double selasa = 0;
+    private double rabu = 0;
+    private double kamis = 0;
+    private double jumat = 0;
+    private double sabtu = 0;
+    private double minggu = 0;
 
 
     @Override
@@ -60,7 +61,7 @@ public class ChartActivity extends AppCompatActivity {
         initBarChart();
         showBarChart();
 
-        binding.paramName.setText("Total Notifikasi " + paramName + " di minggu ke " + week);
+        binding.paramName.setText("Parameter " + paramName + " di minggu ke " + week);
 
 
 
@@ -146,25 +147,25 @@ public class ChartActivity extends AppCompatActivity {
             if(Objects.equals(graphList.get(i).getParameter(), paramName) && Objects.equals(graphList.get(i).getWeek(), week)){
                 switch (graphList.get(i).getDayOfWeek()) {
                     case "Senin":
-                        senin++;
+                        senin = graphList.get(i).getValue();
                         break;
                     case "Selasa":
-                        selasa++;
+                        selasa = graphList.get(i).getValue();
                         break;
                     case "Rabu":
-                        rabu++;
+                        rabu = graphList.get(i).getValue();
                         break;
                     case "Kamis":
-                        kamis++;
+                        kamis = graphList.get(i).getValue();
                         break;
                     case "Jumat":
-                        jumat++;
+                        jumat = graphList.get(i).getValue();
                         break;
                     case "Sabtu":
-                        sabtu++;
+                        sabtu = graphList.get(i).getValue();
                         break;
                     case "Minggu":
-                        minggu++;
+                        minggu = graphList.get(i).getValue();
                         break;
                 }
             }
@@ -198,7 +199,9 @@ public class ChartActivity extends AppCompatActivity {
         }
 
         //fit the data into a bar
-        for (int i = 0; i < valueList.size(); i++) {
+        for (int i = 0; i < 7; i++) {
+            Log.e("adasada", String.valueOf(i+1));
+            Log.e("adasada", String.valueOf(valueList.get(i).floatValue()));
             BarEntry barEntry = new BarEntry(i, valueList.get(i).floatValue());
             entries.add(barEntry);
         }

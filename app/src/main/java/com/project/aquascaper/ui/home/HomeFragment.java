@@ -225,6 +225,7 @@ public class HomeFragment extends Fragment {
                 try {
                     /// fungsi untuk menampilkan selutuh nilai berdasarkan variabel dari atas
                     initData();
+                    updateGraph(ppm, temperature, pHMeter, turbidity);
                 } catch (Exception e) {
                     Log.e("ERROR HOME", e.getMessage());
                 }
@@ -247,25 +248,67 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    private void updateGraph(String ppm, String temperature, String pHMeter, String turbidity) {
+
+        long timeInMillis = System.currentTimeMillis();
+        // Create a DateFormatter object for displaying date in specified format.
+        SimpleDateFormat formatter2 = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        // Create a calendar object that will convert the date and time value in milliseconds to date.
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timeInMillis);
+        String notifId = formatter2.format(calendar.getTime());
+
+
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.setTime(calendar1.getTime());
+        int weekOfYear = calendar1.get(Calendar.WEEK_OF_YEAR);
+
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref2 = database.getReference("graph/"+ "Suhu" + " " + notifId);
+        ref2.child("dayOfWeek").setValue(getCurrentDay());
+        ref2.child("week").setValue(weekOfYear);
+        ref2.child("value").setValue(Double.parseDouble(temperature));
+        ref2.child("parameter").setValue("Suhu");
+
+        DatabaseReference ref3 = database.getReference("graph/"+ "Kekeruhan" + " " + notifId);
+        ref3.child("dayOfWeek").setValue(getCurrentDay());
+        ref3.child("week").setValue(weekOfYear);
+        ref3.child("value").setValue(Double.parseDouble(turbidity));
+        ref3.child("parameter").setValue("Kekeruhan");
+
+        DatabaseReference ref4 = database.getReference("graph/"+ "PPM" + " " + notifId);
+        ref4.child("dayOfWeek").setValue(getCurrentDay());
+        ref4.child("week").setValue(weekOfYear);
+        ref4.child("value").setValue(Double.parseDouble(ppm));
+        ref4.child("parameter").setValue("PPM");
+
+        DatabaseReference ref5 = database.getReference("graph/"+ "pH" + " " + notifId);
+        ref5.child("dayOfWeek").setValue(getCurrentDay());
+        ref5.child("week").setValue(weekOfYear);
+        ref5.child("value").setValue(Double.parseDouble(pHMeter));
+        ref5.child("parameter").setValue("pH");
+    }
+
+
     private void initNotification() {
         if(Double.parseDouble(turbidity) > 25.0) {
             Log.e("1", "1");
             String body = "Air terlalu keruh, pastikan segera membersihkan aquascape";
             sendNotif(body);
-            saveNotif(body, "Kekeruhan");
+            saveNotif(body, "Kekeruhan", Double.parseDouble(turbidity));
         }
 
         if(Double.parseDouble(ppm) > 800.0 && Objects.equals(solenoid, "ON")) {
             Log.e("1", "2");
             String body = "CO2 terlalu tinggi, pastikan segera matikan solenoid";
             sendNotif(body);
-            saveNotif(body, "PPM/CO2");
+            saveNotif(body, "PPM/CO2", Double.parseDouble(ppm));
         } else if (Double.parseDouble(ppm) < 400.0&& Objects.equals(solenoid, "OFF")){
             Log.e("1", "3");
             Log.e("dasadasa", "soleeeee on");
             String body = "CO2 terlalu rendah, pastikan segera menyalakan solenoid";
             sendNotif(body);
-            saveNotif(body, "PPM/CO2");
+            saveNotif(body, "PPM/CO2", Double.parseDouble(ppm));
         }
 
 
@@ -273,12 +316,12 @@ public class HomeFragment extends Fragment {
             Log.e("1", "4");
             String body = "pH terlalu basa, pastikan segera melakukan tindakan menurunkan kadar pH";
             sendNotif(body);
-            saveNotif(body, "pH");
+            saveNotif(body, "pH", Double.parseDouble(pHMeter));
         } else if (Double.parseDouble(pHMeter) < 6.0){
             Log.e("1", "5");
             String body = "pH terlalu asam, pastikan segera melakukan tindakan menaikkan kadar pH";
             sendNotif(body);
-            saveNotif(body, "pH");
+            saveNotif(body, "pH", Double.parseDouble(pHMeter));
         }
 
 
@@ -287,20 +330,21 @@ public class HomeFragment extends Fragment {
 
             String body = "Suhu terlalu panas, pastikan untuk segera menyalakan kipas pada aquascape";
             sendNotif(body);
-            saveNotif(body, "Suhu");
+            saveNotif(body, "Suhu", Double.parseDouble(temperature));
         } else if (Double.parseDouble(temperature) < 24.0 && Objects.equals(ledLamp, "OFF")){
             Log.e("1", "7");
             String body = "Suhu terlalu dingin, pastikan untuk segera menyalakan lampu pada aquascape";
             sendNotif(body);
-            saveNotif(body, "Suhu");
+            saveNotif(body, "Suhu", Double.parseDouble(temperature));
         }
     }
 
     /// fungsi untuk menyimpan notifikasi di firebase
-    private void saveNotif(String body, String param) {
+    private void saveNotif(String body, String param, double value) {
         long timeInMillis = System.currentTimeMillis();
         // Create a DateFormatter object for displaying date in specified format.
         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        SimpleDateFormat formatter2 = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         // Create a calendar object that will convert the date and time value in milliseconds to date.
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timeInMillis);
@@ -317,9 +361,9 @@ public class HomeFragment extends Fragment {
         ref.child("hour").setValue(hour);
         ref.child("dayOfWeek").setValue(getCurrentDay());
         ref.child("week").setValue(weekOfYear);
+        ref.child("value").setValue(value);
         ref.child("parameter").setValue(param);
         ref.child("timeInMillis").setValue(timeInMillis);
-
     }
 
     public String getCurrentDay(){

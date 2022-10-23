@@ -26,7 +26,7 @@ public class GraphViewModel extends ViewModel {
         try {
 
             final FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference ref = database.getReference("notification");
+            DatabaseReference ref = database.getReference("graph");
 
 
             /// mendapatkan list notifikasi dari firebase
@@ -35,22 +35,18 @@ public class GraphViewModel extends ViewModel {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     for (DataSnapshot ds : snapshot.getChildren()) {
                         try {
-                            if (ds.child("hour").getValue() != null && ds.child("notification").getValue() != null) {
-                                String hour = "" + ds.child("hour").getValue();
-                                String notification = "" + ds.child("notification").getValue();
+                            if (ds.child("value").getValue() != null) {
                                 String dayOfWeek = "" + ds.child("dayOfWeek").getValue();
                                 /// week sekarang dimulai dari week 44, untuk inisiasi week1, 2, dst maka harus dikurangi 43
                                 int week = Integer.parseInt("" + ds.child("week").getValue()) - 43;
                                 String parameter = "" + ds.child("parameter").getValue();
-                                long timeInMillis = Long.parseLong("" + ds.child("timeInMillis").getValue());
+                                double value = Double.parseDouble("" + ds.child("value").getValue());
 
                                 GraphModel model = new GraphModel();
-                                model.setNotification(notification);
-                                model.setHour(hour);
                                 model.setDayOfWeek(dayOfWeek);
                                 model.setWeek(week);
                                 model.setParameter(parameter);
-                                model.setTimeInMillis(timeInMillis);
+                                model.setValue(value);
                                 graphicSellModelArrayList.add(model);
                             }
                         } catch (Exception e) {

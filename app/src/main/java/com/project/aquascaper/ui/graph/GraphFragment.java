@@ -45,17 +45,28 @@ public class GraphFragment extends Fragment {
     private int totalWeek = 10;
 
     /// week init
-    private int week1 = 0;
-    private int week2 = 0;
-    private int week3 = 0;
-    private int week4 = 0;
-    private int week5 = 0;
-    private int week6 = 0;
-    private int week7 = 0;
-    private int week8 = 0;
-    private int week9 = 0;
-    private int week10 = 0;
+    private double week1 = 0;
+    private double week2 = 0;
+    private double week3 = 0;
+    private double week4 = 0;
+    private double week5 = 0;
+    private double week6 = 0;
+    private double week7 = 0;
+    private double week8 = 0;
+    private double week9 = 0;
+    private double week10 = 0;
 
+    /// week counter
+    private double cnt1 = 0;
+    private double cnt2 = 0;
+    private double cnt3 = 0;
+    private double cnt4 = 0;
+    private double cnt5 = 0;
+    private double cnt6 = 0;
+    private double cnt7 = 0;
+    private double cnt8 = 0;
+    private double cnt9 = 0;
+    private double cnt10 = 0;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -72,7 +83,7 @@ public class GraphFragment extends Fragment {
 
         viewModel.setGraph();
         viewModel.getGraphic().observe(getViewLifecycleOwner(), notificationList -> {
-            Log.e("Adasada", String.valueOf(notificationList.size()));
+            Log.e("dasad", notificationList.toString());
 
             if (notificationList.size() > 0) {
                 binding.noData.setVisibility(View.GONE);
@@ -80,7 +91,6 @@ public class GraphFragment extends Fragment {
                 graphList = new ArrayList<>();
                 graphList.addAll(notificationList);
 
-                Log.e("Adasada", String.valueOf(graphList.size()));
 
 
                 initBarChart();
@@ -155,6 +165,17 @@ public class GraphFragment extends Fragment {
         week9 = 0;
         week10 = 0;
 
+        cnt1 = 0;
+        cnt2 = 0;
+        cnt3 = 0;
+        cnt4 = 0;
+        cnt5 = 0;
+        cnt6 = 0;
+        cnt7 = 0;
+        cnt8 = 0;
+        cnt9 = 0;
+        cnt10 = 0;
+
         ArrayList<Double> valueList = new ArrayList<Double>();
         ArrayList<BarEntry> entries = new ArrayList<>();
         String title = "Minggu ke: ";
@@ -165,34 +186,44 @@ public class GraphFragment extends Fragment {
             if(Objects.equals(graphList.get(i).getParameter(), paramName)){
                 switch (graphList.get(i).getWeek()) {
                     case 1:
-                        week1++;
+                        cnt1++;
+                        week1 += graphList.get(i).getValue();
                         break;
                     case 2:
-                        week2++;
+                        cnt2++;
+                        week2 += graphList.get(i).getValue();
                         break;
                     case 3:
-                        week3++;
+                        cnt3++;
+                        week3 += graphList.get(i).getValue();
                         break;
                     case 4:
-                        week4++;
+                        cnt4++;
+                        week4 += graphList.get(i).getValue();
                         break;
                     case 5:
-                        week5++;
+                        cnt5++;
+                        week5 += graphList.get(i).getValue();
                         break;
                     case 6:
-                        week6++;
+                        cnt6++;
+                        week6 += graphList.get(i).getValue();
                         break;
                     case 7:
-                        week7++;
+                        cnt7++;
+                        week7 += graphList.get(i).getValue();
                         break;
                     case 8:
-                        week8++;
+                        cnt8++;
+                        week8 += graphList.get(i).getValue();
                         break;
                     case 9:
-                        week9++;
+                        cnt9++;
+                        week9 += graphList.get(i).getValue();
                         break;
                     case 10:
-                        week10++;
+                        cnt10++;
+                        week10 += graphList.get(i).getValue();
                         break;
                 }
             }
@@ -202,42 +233,48 @@ public class GraphFragment extends Fragment {
         for(int i = 0; i < totalWeek; i++){
             switch (i) {
                 case 0:
-                    valueList.add((double) week1);
+                    valueList.add((double) week1 / cnt1);
                     break;
                 case 1:
-                    valueList.add((double) week2);
+                    valueList.add((double) week2/ cnt2);
                     break;
                 case 2:
-                    valueList.add((double) week3);
+                    valueList.add((double) week3 / cnt3);
                     break;
                 case 3:
-                    valueList.add((double) week4);
+                    valueList.add((double) week4 / cnt4);
                     break;
                 case 4:
-                    valueList.add((double) week5);
+                    valueList.add((double) week5/ cnt5);
                     break;
                 case 5:
-                    valueList.add((double) week6);
+                    valueList.add((double) week6/ cnt6);
                     break;
                 case 6:
-                    valueList.add((double) week7);
+                    valueList.add((double) week7/ cnt7);
                     break;
                 case 7:
-                    valueList.add((double) week8);
+                    valueList.add((double) week8/ cnt8);
                     break;
                 case 8:
-                    valueList.add((double) week9);
+                    valueList.add((double) week9/ cnt9);
                     break;
                 case 9:
-                    valueList.add((double) week10);
+                    valueList.add(week10/ cnt10);
                     break;
             }
         }
 
+
         //fit the data into a bar
-        for (int i = 0; i < valueList.size(); i++) {
-            BarEntry barEntry = new BarEntry(i+1, valueList.get(i).floatValue());
-            entries.add(barEntry);
+        for (int i = 0; i < totalWeek; i++) {
+            if(Double.isNaN(valueList.get(i).floatValue())) {
+                BarEntry barEntry = new BarEntry(i+1, 0.0F);
+                entries.add(barEntry);
+            } else {
+                BarEntry barEntry = new BarEntry(i+1, valueList.get(i).floatValue());
+                entries.add(barEntry);
+            }
         }
 
         BarDataSet barDataSet = new BarDataSet(entries, title);
@@ -327,7 +364,7 @@ public class GraphFragment extends Fragment {
             public void onClick(View view) {
                 paramName = "Suhu";
                 initViewModel();
-                binding.paramName.setText("Total Notifikasi " + paramName);
+                binding.paramName.setText("Parameter " + paramName + " per Minggu");
                 binding.graphWrapper.setVisibility(View.VISIBLE);
                 binding.noData.setVisibility(View.GONE);
                 dialog.dismiss();
@@ -340,7 +377,7 @@ public class GraphFragment extends Fragment {
             public void onClick(View view) {
                 paramName = "pH";
                 initViewModel();
-                binding.paramName.setText("Total Notifikasi " + paramName);
+                binding.paramName.setText("Parameter " + paramName  + " per Minggu");
                 binding.graphWrapper.setVisibility(View.VISIBLE);
                 binding.noData.setVisibility(View.GONE);
                 dialog.dismiss();
@@ -352,7 +389,7 @@ public class GraphFragment extends Fragment {
             public void onClick(View view) {
                 paramName = "Kekeruhan";
                 initViewModel();
-                binding.paramName.setText("Total Notifikasi " + paramName);
+                binding.paramName.setText("Parameter " + paramName  + " per Minggu");
                 binding.graphWrapper.setVisibility(View.VISIBLE);
                 binding.noData.setVisibility(View.GONE);
                 dialog.dismiss();
@@ -362,9 +399,9 @@ public class GraphFragment extends Fragment {
         ppm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                paramName = "PPM/CO2";
+                paramName = "PPM";
                 initViewModel();
-                binding.paramName.setText("Total Notifikasi " + paramName);
+                binding.paramName.setText("Parameter " + paramName  + " per Minggu");
                 binding.graphWrapper.setVisibility(View.VISIBLE);
                 binding.noData.setVisibility(View.GONE);
                 dialog.dismiss();
