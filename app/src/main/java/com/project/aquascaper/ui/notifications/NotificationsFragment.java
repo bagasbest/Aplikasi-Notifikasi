@@ -160,7 +160,7 @@ public class NotificationsFragment extends Fragment {
         about.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(requireContext(), AboutActivity.class));
+                startActivity(new Intent(requireContext(), HelpActivity.class));
             }
         });
 
@@ -168,7 +168,7 @@ public class NotificationsFragment extends Fragment {
         help.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(requireContext(), HelpActivity.class));
+                startActivity(new Intent(requireContext(), AboutActivity.class));
             }
         });
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));

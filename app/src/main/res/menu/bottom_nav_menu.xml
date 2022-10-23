@@ -11,4 +11,8 @@
         android:icon="@drawable/ic_baseline_notifications_active_24"
         android:title="@string/title_notifications" />
 
+    <item
+        android:id="@+id/navigation_graph"
+        android:icon="@drawable/ic_baseline_bar_chart_24"
+        android:title="Chart" />
 </menu>

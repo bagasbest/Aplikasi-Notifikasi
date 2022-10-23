@@ -28,14 +28,12 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.project.aquascaper.HomeActivity;
 import com.project.aquascaper.MainActivity;
 import com.project.aquascaper.R;
 import com.project.aquascaper.data.Sensor;
@@ -45,7 +43,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Random;
 
 public class HomeFragment extends Fragment {
 
@@ -166,33 +163,33 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        binding.temperature.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showDialog("Temperature");
-            }
-        });
-
-        binding.phMeter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showDialog("pH Meter");
-            }
-        });
-
-        binding.turbidity.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showDialog("Turbidity");
-            }
-        });
-
-        binding.ppm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showDialog("PPM");
-            }
-        });
+//        binding.temperature.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                showDialog("Temperature");
+//            }
+//        });
+//
+//        binding.phMeter.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                showDialog("pH Meter");
+//            }
+//        });
+//
+//        binding.turbidity.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                showDialog("Turbidity");
+//            }
+//        });
+//
+//        binding.ppm.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                showDialog("PPM");
+//            }
+//        });
 
         binding.swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -255,20 +252,20 @@ public class HomeFragment extends Fragment {
             Log.e("1", "1");
             String body = "Air terlalu keruh, pastikan segera membersihkan aquascape";
             sendNotif(body);
-            saveNotif(body);
+            saveNotif(body, "Kekeruhan");
         }
 
         if(Double.parseDouble(ppm) > 800.0 && Objects.equals(solenoid, "ON")) {
             Log.e("1", "2");
             String body = "CO2 terlalu tinggi, pastikan segera matikan solenoid";
             sendNotif(body);
-            saveNotif(body);
+            saveNotif(body, "PPM/CO2");
         } else if (Double.parseDouble(ppm) < 400.0&& Objects.equals(solenoid, "OFF")){
             Log.e("1", "3");
             Log.e("dasadasa", "soleeeee on");
             String body = "CO2 terlalu rendah, pastikan segera menyalakan solenoid";
             sendNotif(body);
-            saveNotif(body);
+            saveNotif(body, "PPM/CO2");
         }
 
 
@@ -276,12 +273,12 @@ public class HomeFragment extends Fragment {
             Log.e("1", "4");
             String body = "pH terlalu basa, pastikan segera melakukan tindakan menurunkan kadar pH";
             sendNotif(body);
-            saveNotif(body);
+            saveNotif(body, "pH");
         } else if (Double.parseDouble(pHMeter) < 6.0){
             Log.e("1", "5");
             String body = "pH terlalu asam, pastikan segera melakukan tindakan menaikkan kadar pH";
             sendNotif(body);
-            saveNotif(body);
+            saveNotif(body, "pH");
         }
 
 
@@ -290,17 +287,17 @@ public class HomeFragment extends Fragment {
 
             String body = "Suhu terlalu panas, pastikan untuk segera menyalakan kipas pada aquascape";
             sendNotif(body);
-            saveNotif(body);
+            saveNotif(body, "Suhu");
         } else if (Double.parseDouble(temperature) < 24.0 && Objects.equals(ledLamp, "OFF")){
             Log.e("1", "7");
             String body = "Suhu terlalu dingin, pastikan untuk segera menyalakan lampu pada aquascape";
             sendNotif(body);
-            saveNotif(body);
+            saveNotif(body, "Suhu");
         }
     }
 
     /// fungsi untuk menyimpan notifikasi di firebase
-    private void saveNotif(String body) {
+    private void saveNotif(String body, String param) {
         long timeInMillis = System.currentTimeMillis();
         // Create a DateFormatter object for displaying date in specified format.
         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
@@ -309,10 +306,31 @@ public class HomeFragment extends Fragment {
         calendar.setTimeInMillis(timeInMillis);
         String hour = formatter.format(calendar.getTime());
 
+
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.setTime(calendar1.getTime());
+        int weekOfYear = calendar1.get(Calendar.WEEK_OF_YEAR);
+
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("notification/"+ timeInMillis);
         ref.child("notification").setValue(body);
         ref.child("hour").setValue(hour);
+        ref.child("dayOfWeek").setValue(getCurrentDay());
+        ref.child("week").setValue(weekOfYear);
+        ref.child("parameter").setValue(param);
+        ref.child("timeInMillis").setValue(timeInMillis);
+
+    }
+
+    public String getCurrentDay(){
+
+        String daysArray[] = {"Minggu","Senin","Selasa", "Rabu","Kamis","Jumat", "Sabtu"};
+
+        Calendar calendar = Calendar.getInstance();
+        int day = calendar.get(Calendar.DAY_OF_WEEK)- 1;
+
+        return daysArray[day];
+
     }
 
     private void initData() {
@@ -447,7 +465,7 @@ public class HomeFragment extends Fragment {
         about.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(requireContext(), AboutActivity.class));
+                startActivity(new Intent(requireContext(), HelpActivity.class));
             }
         });
 
@@ -455,7 +473,7 @@ public class HomeFragment extends Fragment {
         help.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(requireContext(), HelpActivity.class));
+                startActivity(new Intent(requireContext(), AboutActivity.class));
             }
         });
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));

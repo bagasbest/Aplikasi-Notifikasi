@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.project.aquascaper">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -15,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Aquascaper"
         tools:targetApi="31">
+        <activity
+            android:name=".ui.graph.ChartActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.home.HelpActivity"
             android:exported="false" />
@@ -35,21 +38,20 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".data.MyFirebaseMessagingService"
+        <service
+            android:name=".data.MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
-        <!-- Set custom default icon. This is used when no icon is set
-for incoming notification messages. -->
+        <!--
+ Set custom default icon. This is used when no icon is set
+for incoming notification messages.
+        -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_launcher" />
-        <!-- Set color used with incoming notification messages. This is used
-        when no color is set for the incoming notification message. -->
-
     </application>
 
 </manifest>

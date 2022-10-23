@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginBottom="59dp"
+    tools:context=".ui.graph.GraphFragment">
+
+    <ImageView
+        android:id="@+id/menuOption"
+        android:layout_width="35sp"
+        android:layout_height="35sp"
+        android:layout_marginTop="16sp"
+        android:layout_marginEnd="16sp"
+        android:src="@drawable/ic_baseline_menu_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@+id/menuOption"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/menuOption">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nunito_bold"
+            android:text="AQUA"
+            android:textColor="@color/purple_500"
+            android:textSize="24sp"
+            android:textStyle="italic" />
+
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nunito_bold"
+            android:text="SCAPER"
+            android:textColor="@android:color/holo_green_dark"
+            android:textSize="24sp"
+            android:textStyle="italic" />
+
+
+    </LinearLayout>
+
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="1sp"
+        android:layout_marginTop="16sp"
+        android:background="#EAEAEA"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
+
+    <TextView
+        android:id="@+id/noData"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/poppins"
+        android:layout_marginStart="16sp"
+        android:layout_marginEnd="16sp"
+        android:text="Silahkan Pilih Opsi Grafik pada Menu di pojok kanan atas"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view" />
+
+    <LinearLayout
+        android:id="@+id/graph_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="16sp"
+        android:visibility="gone"
+        android:layout_marginEnd="16sp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view">
+
+<!--        <com.google.android.material.textfield.TextInputLayout-->
+<!--            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="16dp">-->
+
+<!--            <com.rosemaryapp.amazingspinner.AmazingSpinner-->
+<!--                android:id="@+id/graph_time"-->
+<!--                style="@style/Widget.MaterialComponents.AutoCompleteTextView.OutlinedBox"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:hint="Tampilan Grafik Per Waktu" />-->
+
+<!--        </com.google.android.material.textfield.TextInputLayout>-->
+
+
+        <TextView
+            android:id="@+id/paramName"
+            android:layout_width="match_parent"
+            android:layout_marginStart="16sp"
+            android:layout_marginEnd="16sp"
+            android:textAlignment="center"
+            android:layout_height="wrap_content"
+            android:text="Nama Parameter"
+            android:layout_marginTop="16sp"
+            android:textSize="20sp"
+            android:layout_gravity="center"
+            android:fontFamily="@font/nunito_bold"
+            android:textColor="@color/black" />
+
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/barChart_view"
+            android:layout_width="match_parent"
+            android:layout_marginBottom="30sp"
+            android:layout_marginTop="30sp"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
